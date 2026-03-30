@@ -67,10 +67,10 @@ def load_config(config_path: str = "config.yaml") -> dict:
     return config
 
 
-def run_pipeline(article: Article, config: dict, dry_run: bool = False) -> None:
+def run_pipeline(article: Article, config: dict, dry_run: bool = False) -> bool:
     """
     Execute the full translation → format → publish pipeline
-    for a single article.
+    for a single article. Returns True on success, False on failure.
     """
     # ── Step 1: Initialize LLM provider ──────────────────────
     provider = get_provider(config)
@@ -128,44 +128,66 @@ def run_pipeline(article: Article, config: dict, dry_run: bool = False) -> None:
         logger.info(f"Tags: {tags}")
         logger.info(f"File: {filepath}")
         logger.info(f"Content length: {len(full_content)} chars")
-        return
+        return True
 
     # ── Step 7: Push to GitHub ───────────────────────────────
     gh_cfg = config.get("github", {})
-    repo = gh_cfg.get("repository", "")
+    push_strategy = gh_cfg.get("push_strategy", "direct")
 
-    if not repo:
-        logger.warning(
-            "No GitHub repository configured in config.yaml — "
-            "skipping publish step. Set github.repository to enable."
+    if push_strategy == "local_git":
+        # New local git strategy using subprocess
+        from core.github_manager import LocalGitManager
+        
+        manager = LocalGitManager(
+            commit_template=gh_cfg.get("commit_message", "Auto-publish: [{slug}]")
         )
-        return
+        if manager.publish(slug):
+            logger.success(f"Published '{article.title}' to GitHub via local_git strategy!")
+            return True
+        else:
+            logger.error("Failed to push to GitHub via local_git strategy.")
+            return False
+    else:
+        # Existing PyGitHub strategy
+        repo = gh_cfg.get("repository", "")
 
-    publisher = GitHubPublisher(
-        repository=repo,
-        default_branch=gh_cfg.get("default_branch", "main"),
-        push_strategy=gh_cfg.get("push_strategy", "direct"),
-        commit_message_template=gh_cfg.get(
-            "commit_message", "feat: add translated article [{slug}]"
-        ),
-    )
+        if not repo:
+            logger.warning(
+                "No GitHub repository configured in config.yaml — "
+                "skipping publish step. Set github.repository to enable."
+            )
+            return True  # Completed locally
 
-    # File path within the repo
-    content_dir = hugo_cfg.get("content_dir", "content/posts")
-    repo_file_path = f"{hugo_cfg.get('site_dir', 'hugo_site')}/{content_dir}/{filename}"
+        publisher = GitHubPublisher(
+            repository=repo,
+            default_branch=gh_cfg.get("default_branch", "main"),
+            push_strategy=push_strategy,
+            commit_message_template=gh_cfg.get(
+                "commit_message", "feat: add translated article [{slug}]"
+            ),
+        )
 
-    result = publisher.publish(
-        file_path=repo_file_path,
-        content=full_content,
-        slug=slug,
-    )
+        # File path within the repo
+        content_dir = hugo_cfg.get("content_dir", "content/posts")
+        repo_file_path = f"{hugo_cfg.get('site_dir', 'hugo_site')}/{content_dir}/{filename}"
 
-    logger.success(
-        f"Published to GitHub!\n"
-        f"  Strategy: {result['strategy']}\n"
-        f"  Branch:   {result['branch']}\n"
-        f"  URL:      {result.get('url', 'N/A')}"
-    )
+        try:
+            result = publisher.publish(
+                file_path=repo_file_path,
+                content=full_content,
+                slug=slug,
+            )
+
+            logger.success(
+                f"Published to GitHub!\n"
+                f"  Strategy: {result['strategy']}\n"
+                f"  Branch:   {result['branch']}\n"
+                f"  URL:      {result.get('url', 'N/A')}"
+            )
+            return True
+        except Exception as e:
+            logger.error(f"PyGitHub publish failed: {e}")
+            return False
 
 
 def main():

@@ -54,8 +54,19 @@ github:
   # Commit message template — {slug} is replaced at runtime
   commit_message: "feat: add translated article [{slug}]"
 
-  # Push strategy: "direct" or "pr"
-  push_strategy: direct
+  # Push strategy: "direct", "pr", or "local_git"
+  push_strategy: local_git
+
+# --- Daemon Settings ---
+daemon:
+  schedule_hours: 6
+  history_file: "history.json"
+
+# --- RSS Feeds ---
+rss_feeds:
+  - "https://www.bleepingcomputer.com/feed/"
+  - "https://krebsonsecurity.com/feed/"
+  - "https://feeds.feedburner.com/TheHackersNews"
 
 # --- Deployment ---
 deployment:
