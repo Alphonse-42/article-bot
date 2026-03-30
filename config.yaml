@@ -1,0 +1,66 @@
+# ============================================================
+# Article Bot — Central Configuration
+# ============================================================
+# All secrets (API keys, tokens) must be set in a .env file.
+# This file contains non-secret configuration only.
+# ============================================================
+
+# --- LLM Provider Settings ---
+llm:
+  # Supported providers: ollama, openai, anthropic, google
+  provider: ollama
+
+  # Model name (provider-specific)
+  model: qwen2.5:14b
+
+  # Only used for Ollama — ignored by cloud providers
+  base_url: "http://localhost:11434"
+
+  # Generation parameters
+  temperature: 0.3
+  max_tokens: 8192
+
+  # Retry settings for transient failures
+  max_retries: 3
+  retry_delay_seconds: 5
+
+# --- Translation Settings ---
+translation:
+  source_language: Turkish
+  target_language: English
+  target_level: "C1 (professional technical)"
+  prompt_template: prompts/code_aware_translate.txt
+
+# --- Tag Generation ---
+tags:
+  enabled: true
+  max_tags: 8
+
+# --- Hugo / Content Settings ---
+hugo:
+  site_dir: hugo_site
+  content_dir: content/posts
+  base_url: "https://article-bot.pages.dev"
+  site_title: "Translated Tech Articles"
+
+# --- GitHub Settings ---
+github:
+  # Repository in "owner/repo" format — set after creation
+  repository: ""
+
+  # Branch to push content to
+  default_branch: main
+
+  # Commit message template — {slug} is replaced at runtime
+  commit_message: "feat: add translated article [{slug}]"
+
+  # Push strategy: "direct" or "pr"
+  push_strategy: direct
+
+# --- Deployment ---
+deployment:
+  # Platform: cloudflare or vercel
+  platform: cloudflare
+
+  # Cloudflare Pages project name
+  project_name: article-bot

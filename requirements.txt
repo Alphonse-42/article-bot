@@ -1,0 +1,25 @@
+# Core pipeline
+PyYAML>=6.0
+python-dotenv>=1.0.0
+requests>=2.31.0
+loguru>=0.7.0
+
+# Article fetching
+beautifulsoup4>=4.12.0
+markdownify>=0.13.0
+feedparser>=6.0.0
+
+# LLM providers
+openai>=1.30.0
+anthropic>=0.25.0
+google-generativeai>=0.5.0
+
+# GitHub integration
+PyGithub>=2.3.0
+
+# CLI
+rich>=13.7.0
+
+# Testing
+pytest>=8.0.0
+pytest-mock>=3.12.0

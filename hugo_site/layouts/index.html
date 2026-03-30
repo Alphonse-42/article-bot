@@ -1,0 +1,43 @@
+{{ define "main" }}
+<section class="hero">
+  <div class="hero-content">
+    <h1 class="hero-title">
+      <span class="hero-icon">⚡</span>
+      {{ .Site.Title }}
+    </h1>
+    <p class="hero-description">{{ .Site.Params.description }}</p>
+    <a href="{{ "posts/" | absURL }}" class="hero-cta">Browse Articles →</a>
+  </div>
+</section>
+
+<section class="latest-posts">
+  <h2 class="section-title">Latest Articles</h2>
+  <div class="article-grid">
+    {{ range first 6 (where .Site.RegularPages "Section" "posts") }}
+    <a href="{{ .Permalink }}" class="article-card">
+      <div class="card-content">
+        <time class="card-date" datetime="{{ .Date.Format "2006-01-02" }}">
+          {{ .Date.Format "Jan 2, 2006" }}
+        </time>
+        <h3 class="card-title">{{ .Title }}</h3>
+        <p class="card-excerpt">{{ .Summary | plainify | truncate 150 }}</p>
+        {{ with .Params.tags }}
+        <div class="card-tags">
+          {{ range first 3 . }}
+            <span class="card-tag">#{{ . }}</span>
+          {{ end }}
+        </div>
+        {{ end }}
+      </div>
+      <span class="card-arrow">→</span>
+    </a>
+    {{ end }}
+  </div>
+
+  {{ if gt (len (where .Site.RegularPages "Section" "posts")) 6 }}
+  <div class="view-all">
+    <a href="{{ "posts/" | absURL }}" class="view-all-link">View All Articles →</a>
+  </div>
+  {{ end }}
+</section>
+{{ end }}

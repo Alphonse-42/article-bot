@@ -1,0 +1,56 @@
+baseURL = "https://article-bot.pages.dev"
+languageCode = "en-us"
+title = "Translated Tech Articles"
+theme = "PaperMod"
+
+# Pagination
+paginate = 10
+
+# Markdown rendering settings
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true     # Allow raw HTML in markdown (for embeds etc.)
+    [markup.goldmark.extensions]
+      definitionList = true
+      footnote       = true
+      strikethrough  = true
+      table          = true
+      typographer    = true
+  [markup.highlight]
+    codeFences = true
+    guessSyntax = true
+    hl_Lines = ""
+    lineNoStart = 1
+    lineNos = true
+    lineNumbersInTable = true
+    noClasses = true
+    style = "dracula"
+    tabWidth = 4
+
+# PaperMod specific parameters
+[params]
+  description = "Curated technical articles, professionally translated from Turkish to English via Article Bot."
+  author = "Article Bot"
+  dateFormat = "January 2, 2006"
+  defaultTheme = "auto"
+
+  # Show a reading time and word count for tech articles
+  ShowReadingTime = true
+  ShowWordCount = true
+  ShowPostNavLinks = true
+  ShowToc = true
+  TocOpen = false
+
+  # Enable syntax highlighting explicitly in the theme if required
+  assets = true
+
+[menu]
+  [[menu.main]]
+    name = "Home"
+    url = "/"
+    weight = 1
+  [[menu.main]]
+    name = "Articles"
+    url = "/posts/"
+    weight = 2

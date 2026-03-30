@@ -1,0 +1,51 @@
+name: Deploy Hugo site to Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+      statuses: write
+
+    # Do not proceed with deployment if the build step fails
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true      # Essential for pulling the PaperMod theme
+          fetch-depth: 0        # Needed to correctly generate lastmod timestamps in Hugo
+
+      - name: Setup cache
+        uses: actions/cache@v4
+        with:
+          path: /tmp/hugo_cache
+          key: ${{ runner.os }}-hugo-${{ hashFiles('hugo_site/**') }}
+          restore-keys: |
+            ${{ runner.os }}-hugo-
+
+      - name: Setup Hugo setup
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: 'latest'
+          extended: true
+
+      - name: Build Hugo Site
+        run: |
+          cd hugo_site
+          hugo --minify --gc
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: 'article-bot'
+          directory: 'hugo_site/public'
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,30 @@
+{{ define "main" }}
+<section class="list-page">
+  <h1 class="list-title">{{ .Title }}</h1>
+
+  <div class="article-grid">
+    {{ range .Paginator.Pages }}
+    <a href="{{ .Permalink }}" class="article-card">
+      <div class="card-content">
+        <time class="card-date" datetime="{{ .Date.Format "2006-01-02" }}">
+          {{ .Date.Format "Jan 2, 2006" }}
+        </time>
+        <h2 class="card-title">{{ .Title }}</h2>
+        <p class="card-excerpt">{{ .Summary | plainify | truncate 150 }}</p>
+        {{ with .Params.tags }}
+        <div class="card-tags">
+          {{ range first 3 . }}
+            <span class="card-tag">#{{ . }}</span>
+          {{ end }}
+        </div>
+        {{ end }}
+      </div>
+      <span class="card-arrow">→</span>
+    </a>
+    {{ end }}
+  </div>
+
+  <!-- Pagination -->
+  {{ template "_internal/pagination.html" . }}
+</section>
+{{ end }}

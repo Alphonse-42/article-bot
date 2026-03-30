@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {{ partial "head.html" . }}
+</head>
+<body>
+  <div class="site-wrapper">
+
+    <!-- Navigation -->
+    <nav class="navbar">
+      <div class="nav-inner">
+        <a class="nav-logo" href="{{ .Site.BaseURL }}">
+          <span class="logo-icon">⚡</span>
+          <span class="logo-text">{{ .Site.Title }}</span>
+        </a>
+        <div class="nav-links">
+          {{ range .Site.Menus.main }}
+            <a href="{{ .URL }}" class="nav-link {{ if $.IsMenuCurrent "main" . }}active{{ end }}">
+              {{ .Name }}
+            </a>
+          {{ end }}
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      {{ block "main" . }}{{ end }}
+    </main>
+
+    <!-- Footer -->
+    {{ partial "footer.html" . }}
+
+  </div>
+</body>
+</html>
